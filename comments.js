@@ -1,18 +1,41 @@
-// Create a web server
-// Create a web server that listens on port 3000. When it receives a request, it responds with a random comment from the comments array in comments.js. The response should be in JSON format.
-// Example:
-// $ curl http://localhost:3000
-// {"comment":"What a great day!"}
-const http = require('http');
-const comments = require('./comments');
+//create a we server
+var http = require('http');
+var fs = require('fs');
+var url = require('url');
+var port = 3000;
+var comments = [];
 
-const server = http.createServer((req, res) => {
-  res.setHeader('Content-Type', 'application/json');
-
-  const randomComment = comments[Math.floor(Math.random() * comments.length)];
-  res.end(JSON.stringify({ comment: randomComment }));
+var server = http.createServer(function(req, res){
+  var parsedUrl = url.parse(req.url, true);
+  var path = parsedUrl.pathname;
+  var query = parsedUrl.query;
+  console.log(path);
+  if(path === '/'){
+    fs.readFile('./index.html', function(err, data){
+      if(err){
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.end('文件读取失败，请稍后重试！');
+      }else{
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.end(data);
+      }
+    });
+  }else if(path === '/comments'){
+    var comment = query.comment;
+    comments.push(comment);
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.end(JSON.stringify(comments));
+  }else{
+    fs.readFile('.' + path, function(err, data){
+      if(err){
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+        res.end('文件读取失败，请稍后重试！');
+      }else{
+        res.end(data);
+      }
+    });
+  }
 });
 
-server.listen(3000, () => {
-  console.log('Server listening on port 3000');
-});
+server.listen(port, function(){
+  console.log('server is running at http://
