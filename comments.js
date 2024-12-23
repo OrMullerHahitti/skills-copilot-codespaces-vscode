@@ -1,41 +1,19 @@
-//create a we server
+// Create web server
+// 1. Load http module
 var http = require('http');
 var fs = require('fs');
-var url = require('url');
-var port = 3000;
-var comments = [];
 
-var server = http.createServer(function(req, res){
-  var parsedUrl = url.parse(req.url, true);
-  var path = parsedUrl.pathname;
-  var query = parsedUrl.query;
-  console.log(path);
-  if(path === '/'){
-    fs.readFile('./index.html', function(err, data){
-      if(err){
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.end('文件读取失败，请稍后重试！');
-      }else{
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.end(data);
-      }
-    });
-  }else if(path === '/comments'){
-    var comment = query.comment;
-    comments.push(comment);
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-    res.end(JSON.stringify(comments));
-  }else{
-    fs.readFile('.' + path, function(err, data){
-      if(err){
-        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-        res.end('文件读取失败，请稍后重试！');
-      }else{
-        res.end(data);
-      }
-    });
-  }
-});
+// 2. Create server
+http.createServer(function (req, res) {
+    // 3. Set the response HTTP header with HTTP status and Content type
+    res.writeHead(200, { 'Content-Type': 'text/html' });
 
-server.listen(port, function(){
-  console.log('server is running at http://
+    // 4. Send the response body "Hello World"
+    fs.readFile('comments.html', function(err, data) {
+        res.write(data);
+        return res.end();
+    });
+}).listen(8080);
+
+// Console will print the message
+console.log('Server running at http://
